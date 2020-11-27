@@ -1,0 +1,8 @@
+﻿################################################################################
+# Ten plik .gitignore został utworzony automatycznie przez Microsoft(R) Visual Studio.
+################################################################################
+
+/Kalkulator-Serwer/bin/Debug
+/Kalkulator-Serwer/obj
+/Projekt-IO-Kalkulator/bin/Debug
+/Projekt-IO-Kalkulator/obj
