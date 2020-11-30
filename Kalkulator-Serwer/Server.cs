@@ -66,7 +66,8 @@ namespace Kalkulator_Serwer
             byte[] buffer_get = new byte[1024];
             byte[] buffer_send;
 
-            buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj liczby pojedynczo. W odpowiedzi otrzymasz te liczby spierwiastkowane. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
+            //buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj liczby pojedynczo. W odpowiedzi otrzymasz te liczby spierwiastkowane. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
+            buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj działania matematyczne. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
             stream.Write(buffer_send, 0, buffer_send.Length);
 
             while (true)
@@ -84,14 +85,13 @@ namespace Kalkulator_Serwer
                     if (str.Equals("EXIT")) { break; }
 
                     string output_string;
-                    double input_number;
 
                     //Jeśli konwersja na typ double się uda wyślij wynik, jeśli nie to poinformuj użytkownika
-                    if (Double.TryParse(str, out input_number))
+                    if (true) //Test czy dzialanie jest poprawne np.: CheckCorrectness(str)
                     {
-                        double result = Math.Sqrt(input_number);
+                        double result = 0.0; //Obliczanie ostatecznego wyniku z obliczenia np Calculate(str)
 
-                        output_string = "sqrt(" + str + ") = " + result.ToString() + "\r\n";
+                        output_string = str + " = " + result.ToString() + "\r\n";
                     }
                     else
                     {
@@ -102,7 +102,7 @@ namespace Kalkulator_Serwer
                         }
                         else
                         {
-                            output_string = "Nie wprowadzono liczby.\r\n";
+                            output_string = "Nie wprowadzono poprawnego działania.\r\n";
                         }
                     }
 
