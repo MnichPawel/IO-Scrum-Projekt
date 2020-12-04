@@ -54,6 +54,18 @@ namespace Kalkulator_Serwer
             TcpClient tcpClient = (TcpClient)ar.AsyncState;
             tcpClient.Close();
         }
+        
+        //Funkcja wykorzystująca klasę ShuntingYardParser do przetwarzania ciągu wejściowego na listę tokenów
+        public IEnumerable<Projekt_IO_Kalkulator.Token> InfixToPostfix(string message)
+        {
+            var text = Console.ReadLine();
+            using (var reader = new StringReader(text))
+            {
+                var parser = new Projekt_IO_Kalkulator.Parser();
+                var tokens = parser.Tokenize(reader).ToList();
+                return parser.ShuntingYard(tokens);
+            }
+        }
 
         /// <summary>
         /// Funkcja która oczekuje na wiadomości oraz na nie odpowiada, działa aż do przesłania ciągu znaków EXIT
