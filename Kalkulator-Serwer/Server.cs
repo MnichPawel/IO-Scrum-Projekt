@@ -10,6 +10,8 @@ namespace Kalkulator_Serwer
 {
     public class Server
     {
+        string znak = "";
+        double x, y = 0;
         public delegate void TransmissionDataDelegate(NetworkStream stream);
 
         TcpListener listener;
@@ -101,8 +103,9 @@ namespace Kalkulator_Serwer
                     //Jeśli konwersja na typ double się uda wyślij wynik, jeśli nie to poinformuj użytkownika
                     if (true) //Test czy dzialanie jest poprawne np.: CheckCorrectness(str)
                     {
-                        double result = 0.0; //Obliczanie ostatecznego wyniku z obliczenia np Calculate(str)
-
+                        obliczenia licz1 = new obliczenia(x,y,znak);
+                        double result =licz1.dzialanie(x,y,znak); //Obliczanie ostatecznego wyniku z obliczenia np Calculate(str)
+                        
                         output_string = str + " = " + result.ToString() + "\r\n";
                     }
                     else
