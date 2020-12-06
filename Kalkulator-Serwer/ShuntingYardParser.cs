@@ -4,141 +4,108 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Projekt_IO_Kalkulator
+namespace Kalkulator_Serwer
 {
-    public enum TokenType { Number, Variable, Function, Parenthesis, Operator, Comma, WhiteSpace };
-
-    public struct Token
-    {
-        public TokenType Type { get; }
-        public string Value { get; }
-
-        public override string ToString() => $"{Type}: {Value}";
-
-        public Token(TokenType type, string value)
+    public class Parser {
+        static public Queue<string> ParseString(string str)
         {
-            Type = type;
-            Value = value;
-        }
-    }
+            Dictionary<char, int> precedence = new Dictionary<char, int>();
+            precedence.Add('+', 2);
+            precedence.Add('-', 2);
+            precedence.Add('/', 3);
+            precedence.Add('*', 3);
+            precedence.Add('^', 4);
 
-    class Operator
-    {
-        public string Name { get; set; }
-        public int Precedence { get; set; }
-        public bool RightAssociative { get; set; }
-    }
+            Queue<string> to_return_queue = new Queue<string>();
 
-    public class Parser
-    {
-        private IDictionary<string, Operator> operators = new Dictionary<string, Operator>
-        {
-            ["+"] = new Operator { Name = "+", Precedence = 1 },
-            ["-"] = new Operator { Name = "-", Precedence = 1 },
-            ["*"] = new Operator { Name = "*", Precedence = 2 },
-            ["/"] = new Operator { Name = "/", Precedence = 2 },
-            ["^"] = new Operator { Name = "^", Precedence = 3, RightAssociative = true }
-        };
+            Stack<string> operacje = new Stack<string>();
 
-        private bool CompareOperators(Operator op1, Operator op2)
-        {
-            return op1.RightAssociative ? op1.Precedence < op2.Precedence : op1.Precedence <= op2.Precedence;
-        }
-
-        private bool CompareOperators(string op1, string op2) => CompareOperators(operators[op1], operators[op2]);
-
-        private TokenType DetermineType(char ch)
-        {
-            if (char.IsLetter(ch))
-                return TokenType.Variable;
-            if (char.IsDigit(ch))
-                return TokenType.Number;
-            if (char.IsWhiteSpace(ch))
-                return TokenType.WhiteSpace;
-            if (ch == ',')
-                return TokenType.Comma;
-            if (ch == '(' || ch == ')')
-                return TokenType.Parenthesis;
-            if (operators.ContainsKey(Convert.ToString(ch)))
-                return TokenType.Operator;
-
-            throw new Exception("Wrong character");
-        }
-
-        public IEnumerable<Token> Tokenize(TextReader reader)
-        {
-            var token = new StringBuilder();
-
-            int curr;
-            while ((curr = reader.Read()) != -1)
+            for(int i = 0; i < str.Length; ++i)
             {
-                var ch = (char)curr;
-                var currType = DetermineType(ch);
-                if (currType == TokenType.WhiteSpace)
-                    continue;
-
-                token.Append(ch);
-
-                var next = reader.Peek();
-                var nextType = next != -1 ? DetermineType((char)next) : TokenType.WhiteSpace;
-                if (currType != nextType)
+                char znak = str[i];
+                if (Char.IsWhiteSpace(znak) || znak == ',')
                 {
-                    if (next == '(')
-                        yield return new Token(TokenType.Function, token.ToString());
-                    else
-                        yield return new Token(currType, token.ToString());
-                    token.Clear();
+                    //ignoruj
+                }
+                else if (Char.IsDigit(znak))
+                {
+                    string liczba = "";
+                    /*if(operacje.Peek() == "-")
+                    {
+                        operacje.Pop();
+                        liczba += "-";
+                    }*/
+                    liczba += znak;
+
+                    int temp_i = i + 1;
+                    while(temp_i < str.Length && (str[temp_i] == '.' || Char.IsDigit(str[temp_i])))
+                    {
+                        liczba += str[temp_i];
+                        temp_i++;
+                    }
+                    i = temp_i - 1;
+                    to_return_queue.Enqueue(liczba);
+                }
+                else if (znak == 'r' && str[i + 1] == 'o' && str[i + 2] == 'o' && str[i + 3] == 't')
+                {
+                    operacje.Push("root");
+                    i += 3;
+                }
+                else if(znak == ',') { 
+                    while(operacje.Peek().ToCharArray()[0] != '(')
+                    {
+                        to_return_queue.Enqueue(operacje.Pop());
+                    }
+                
+                }
+                else if (znak == '+' || znak == '-' || znak == '*' || znak == '/' || znak == '^')
+                {
+                    while(
+                        operacje.Count > 0 && 
+                        operacje.Peek().Length == 1 &&
+                        operacje.Peek().ToCharArray()[0] != '(' &&
+                        (
+                            precedence[operacje.Peek().ToCharArray()[0]] > precedence[znak] ||
+                            (precedence[operacje.Peek().ToCharArray()[0]] == precedence[znak] && znak != '^')
+                        )
+                        
+                    )
+                    {
+                        to_return_queue.Enqueue(operacje.Pop());
+                    }
+                    operacje.Push(znak.ToString());
+                }
+                else if(znak == '(')
+                {
+                    operacje.Push(znak.ToString());
+                }
+                else if (znak == ')')
+                {
+                    while (
+                       operacje.Peek().ToCharArray()[0] != '('
+                    )
+                    {
+                        to_return_queue.Enqueue(operacje.Pop());
+                    }
+
+                    if(operacje.Peek().ToCharArray()[0] == '(')
+                    {
+                        operacje.Pop();
+                    }
+
+                    if(operacje.Peek() == "root")
+                    {
+                        to_return_queue.Enqueue(operacje.Pop());
+                    }
                 }
             }
-        }
 
-        public IEnumerable<Token> ShuntingYard(IEnumerable<Token> tokens)
-        {
-            var stack = new Stack<Token>();
-            foreach (var tok in tokens)
+            while(operacje.Count > 0)
             {
-                switch (tok.Type)
-                {
-                    case TokenType.Number:
-                    case TokenType.Variable:
-                        yield return tok;
-                        break;
-                    case TokenType.Function:
-                        stack.Push(tok);
-                        break;
-                    case TokenType.Comma:
-                        while (stack.Peek().Value != "(")
-                            yield return stack.Pop();
-                        break;
-                    case TokenType.Operator:
-                        while (stack.Any() && stack.Peek().Type == TokenType.Operator && CompareOperators(tok.Value, stack.Peek().Value))
-                            yield return stack.Pop();
-                        stack.Push(tok);
-                        break;
-                    case TokenType.Parenthesis:
-                        if (tok.Value == "(")
-                            stack.Push(tok);
-                        else
-                        {
-                            while (stack.Count>0 && stack.Peek().Value != "(")
-                                yield return stack.Pop();
-                            if (stack.Count > 0)
-                                stack.Pop();
-                            if (stack.Count>0 && stack.Peek().Type == TokenType.Function)
-                                yield return stack.Pop();
-                        }
-                        break;
-                    default:
-                        throw new Exception("Wrong token");
-                }
+                to_return_queue.Enqueue(operacje.Pop());
             }
-            while (stack.Any())
-            {
-                var tok = stack.Pop();
-                if (tok.Type == TokenType.Parenthesis)
-                    throw new Exception("Mismatched parentheses");
-                yield return tok;
-            }
+
+            return to_return_queue;
         }
     }
 }

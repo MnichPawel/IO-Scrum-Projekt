@@ -56,18 +56,6 @@ namespace Kalkulator_Serwer
             TcpClient tcpClient = (TcpClient)ar.AsyncState;
             tcpClient.Close();
         }
-        
-        //Funkcja wykorzystująca klasę ShuntingYardParser do przetwarzania ciągu wejściowego na listę tokenów
-        public IEnumerable<Projekt_IO_Kalkulator.Token> InfixToPostfix(string message)
-        {
-            var text = Console.ReadLine();
-            using (var reader = new StringReader(text))
-            {
-                var parser = new Projekt_IO_Kalkulator.Parser();
-                var tokens = parser.Tokenize(reader).ToList();
-                return parser.ShuntingYard(tokens);
-            }
-        }
 
         /// <summary>
         /// Funkcja która oczekuje na wiadomości oraz na nie odpowiada, działa aż do przesłania ciągu znaków EXIT
@@ -81,7 +69,7 @@ namespace Kalkulator_Serwer
             byte[] buffer_send;
 
             //buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj liczby pojedynczo. W odpowiedzi otrzymasz te liczby spierwiastkowane. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
-            buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj działania matematyczne. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
+            buffer_send = Encoding.UTF8.GetBytes("Napisz HELP aby uzyskać pomoc.");
             stream.Write(buffer_send, 0, buffer_send.Length);
 
             while (true)
@@ -99,25 +87,33 @@ namespace Kalkulator_Serwer
                     if (str.Equals("EXIT")) { break; }
 
                     string output_string;
-
-                    //Jeśli konwersja na typ double się uda wyślij wynik, jeśli nie to poinformuj użytkownika
-                    if (true) //Test czy dzialanie jest poprawne np.: CheckCorrectness(str)
+                    
+                    //Sprawdź czy to nie komenda
+                    if (str.Equals("CLIENTS"))
                     {
-                        obliczenia licz1 = new obliczenia(x,y,znak);
-                        double result =licz1.dzialanie(x,y,znak); //Obliczanie ostatecznego wyniku z obliczenia np Calculate(str)
-                        
-                        output_string = str + " = " + result.ToString() + "\r\n";
+                        //Zwróć liczbę podłączonych klientów
+                        output_string = "Liczba klientów: " + number_of_connected_clients.ToString() + "\r\n";
+                    }
+                    else if (str.Equals("HELP"))
+                    {
+                        //Zwróć pomoc
+                        output_string = "Wprowadzaj działania matematyczne, program obsługuje funkcje root(x, y). Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Jeśli chcesz użyć funkcji to jeśli jako argument użyte jest jakieś złożone obliczenie zamiast jednej liczby to należy je włożyć w nawiasy. \r\n";
                     }
                     else
                     {
-                        //Zwróć liczbę podłączonych klientów
-                        if (str.Equals("CLIENTS"))
+                        try
                         {
-                            output_string = "Liczba klientów: " + number_of_connected_clients.ToString() + "\r\n";
+                            Queue<string> converted_string = Parser.ParseString(str);
+                            Obliczenia licz1 = new Obliczenia(converted_string);
+                            licz1.Wykonaj(); //Obliczanie ostatecznego wyniku z obliczenia
+                            double result = licz1.Wynik(); 
+
+                            output_string = str + " = " + result.ToString() + "\r\n";
                         }
-                        else
+                        catch
                         {
-                            output_string = "Nie wprowadzono poprawnego działania.\r\n";
+                            //Jeśli konwersja na typ double się uda wyślij wynik, jeśli nie to poinformuj użytkownika
+                            output_string = "Błąd przy przetwarzaniu dzialania\r\n";
                         }
                     }
 

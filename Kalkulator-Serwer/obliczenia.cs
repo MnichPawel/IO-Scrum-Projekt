@@ -5,74 +5,125 @@ using System.Text;
 
 namespace Kalkulator_Serwer
 {
-    public class obliczenia{
-        public double x, y, wynik = 0.0;
-        public string znak = "";
-        public obliczenia(double X, double Y, string Znak)
+    public class Obliczenia{
+        public double wynik = 0.0;
+        Queue<string> dzialanie;
+        bool error;
+        string error_text;
+
+        public Obliczenia(Queue<string> dzialani)
         {
-            x = X;
-            y = Y;
-            znak = Znak;
+            dzialanie = dzialani;
         }
 
-        public double dzialanie(double x, double y, string znak){
-            if (znak == "+")
-                wynik = plus(x, y);
-            else if (znak == "-")
-                wynik = minus(x, y);
-            else if (znak == "*")
-                wynik = razy(x, y);
-            else if (znak == "/")
-                wynik = dziel(x, y);
-            else if (znak == "^")
-                wynik = pow(x, y);
-            else if (znak == "sqrt")
-                wynik = sqrt(x, y);
-            else if (znak == "!")
-                wynik = silnia(x);
+        public void Wykonaj(){
+            Stack<double> numbers = new Stack<double>();
 
-            return wynik;
+            Queue<string> str = dzialanie;
+
+            while (str.Count > 0)
+            {
+                if (double.TryParse(str.Peek().Replace('.', ','), out double val))
+                {
+                    numbers.Push(val);
+                }
+                else if (str.Peek().Equals("+"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Plus(val1, val2));
+                }
+                else if (str.Peek().Equals("-"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Minus(val2, val1));
+                }
+                else if (str.Peek().Equals("*"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Razy(val1, val2));
+                }
+                else if (str.Peek().Equals("/"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Dziel(val2, val1));
+                }
+                else if (str.Peek().Equals("^"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Pow(val2, val1));
+                }
+                else if (str.Peek().Equals("root"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Root(val2, val1));
+                }
+                str.Dequeue();
+            }
+
+
+            wynik = numbers.Pop();
         }
 
-        public double plus(double x,double y) {
-            wynik = x + y;   
-            return wynik;
+        public double Plus(double x,double y) {
+            return x + y;
         }
-        public double minus(double x, double y)
+        public double Minus(double x, double y)
         {
-            wynik = x - y;
-            return wynik;
+            return x - y;
         }
-        public double razy(double x, double y)
+        public double Razy(double x, double y)
         {
-            wynik = x * y;
-            return wynik;
+            return x * y;
         }
-        public double dziel(double x, double y)
+        public double Dziel(double x, double y)
         {
             if (y != 0)
-                wynik = x / y;
+            {
+                return x / y;
+            }
             else
-                System.Console.WriteLine("nie mozna dzielić przez 0");
-            return wynik;
+            {
+                error = true;
+                error_text = "Nie mozna dzielic przez zero";
+            }
+            return 0.0;
         }
-        public double pow(double x, double y)
+        public double Pow(double x, double y)
         {
-            wynik = Math.Pow(x, y);
-            return wynik;
+            return Math.Pow(x, y);
         }
-        public double sqrt(double x, double y)
+        public double Root(double x, double y)
         {
             double z = 1 / y;
-            wynik = Math.Pow(x, z);
-            return wynik;
+            return Math.Pow(x, z);
         }
-        public double silnia(double x)
+        public double Silnia(double x)
         {
-            wynik = 1;
+            double w = 1;
             for (int i = 1; i <= x; i++){
-                wynik *= i;
+                w *= i;
             }
+            return w;
+        }
+
+        public bool BylBlad()
+        {
+            return error;
+        }
+
+        public string TextBledu()
+        {
+            return error_text;
+        }
+
+        public double Wynik()
+        {
             return wynik;
         }
     }
