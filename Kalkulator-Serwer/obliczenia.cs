@@ -63,7 +63,23 @@ namespace Kalkulator_Serwer
                     double val2 = numbers.Pop();
                     numbers.Push(Root(val2, val1));
                 }
+                else if (str.Peek().Equals("sin"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Sin(val1));
+                }
+                else if (str.Peek().Equals("cos"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Cos(val1));
+                }
+                else if (str.Peek().Equals("tan"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Tan(val1));
+                }
                 str.Dequeue();
+                if(error) { wynik = 0.0; return; }
             }
 
 
@@ -110,6 +126,21 @@ namespace Kalkulator_Serwer
                 w *= i;
             }
             return w;
+        }
+
+        public double Sin(double x)
+        {
+            return Math.Sin(x);
+        }
+
+        public double Cos(double x)
+        {
+            return Math.Cos(x);
+        }
+
+        public double Tan(double x)
+        {
+            return Math.Tan(x);
         }
 
         public bool BylBlad()

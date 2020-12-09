@@ -46,10 +46,34 @@ namespace Kalkulator_Serwer
                     i = temp_i - 1;
                     to_return_queue.Enqueue(liczba);
                 }
+                else if ((znak == 'p' || znak == 'P') && (str[i + 1] == 'i' || str[i + 1] == 'I'))
+                {
+                    to_return_queue.Enqueue(Math.PI.ToString());
+                    i += 1;
+                }
+                else if (znak == 'e' || znak == 'E')
+                {
+                    to_return_queue.Enqueue(Math.E.ToString());
+                }
                 else if (znak == 'r' && str[i + 1] == 'o' && str[i + 2] == 'o' && str[i + 3] == 't')
                 {
                     operacje.Push("root");
                     i += 3;
+                }
+                else if (znak == 's' && str[i + 1] == 'i' && str[i + 2] == 'n')
+                {
+                    operacje.Push("sin");
+                    i += 2;
+                }
+                else if (znak == 'c' && str[i + 1] == 'o' && str[i + 2] == 's')
+                {
+                    operacje.Push("cos");
+                    i += 2;
+                }
+                else if (znak == 't' && str[i + 1] == 'a' && str[i + 2] == 'n')
+                {
+                    operacje.Push("tan");
+                    i += 2;
                 }
                 else if(znak == ',') { 
                     while(operacje.Peek().ToCharArray()[0] != '(')

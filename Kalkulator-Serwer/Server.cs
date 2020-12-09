@@ -106,13 +106,20 @@ namespace Kalkulator_Serwer
                             Queue<string> converted_string = Parser.ParseString(str);
                             Obliczenia licz1 = new Obliczenia(converted_string);
                             licz1.Wykonaj(); //Obliczanie ostatecznego wyniku z obliczenia
-                            double result = licz1.Wynik(); 
+                            double result = licz1.Wynik();
 
-                            output_string = str + " = " + result.ToString() + "\r\n";
+                            if (licz1.BylBlad())
+                            {
+                                output_string = licz1.TextBledu() + "\r\n";
+                            }
+                            else
+                            {
+                                output_string = str + " = " + result.ToString() + "\r\n";
+                            }
                         }
                         catch
                         {
-                            //Jeśli konwersja na typ double się uda wyślij wynik, jeśli nie to poinformuj użytkownika
+                            //Jeśli byl nieznany blad to poinformuj uzytkownika
                             output_string = "Błąd przy przetwarzaniu dzialania\r\n";
                         }
                     }
