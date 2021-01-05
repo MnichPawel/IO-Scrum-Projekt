@@ -97,7 +97,20 @@ namespace Kalkulator_Serwer
                     else if (str.Equals("HELP"))
                     {
                         //Zwróć pomoc
-                        output_string = "Wprowadzaj działania matematyczne, program obsługuje funkcje root(x, y). Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Jeśli chcesz użyć funkcji to jeśli jako argument użyte jest jakieś złożone obliczenie zamiast jednej liczby to należy je włożyć w nawiasy. \r\n";
+                        output_string = "Wprowadzaj działania matematyczne, aby otrzymać listę dostępnych funkcji napisz FUNCTIONS. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Jeśli chcesz użyć funkcji to jeśli jako argument użyte jest jakieś złożone obliczenie zamiast jednej liczby to należy je włożyć w nawiasy. \r\n";
+                    }
+                    else if (str.Equals("FUNCTIONS"))
+                    {
+                        //Zwróć pomoc
+                        output_string = "root(x, y) \r\n"
+                                      + "sin(x) \r\n"
+                                      + "cos(x) \r\n"
+                                      + "tan(x) \r\n"
+                                      + "factorial(x) \r\n"
+                                      + "log(x, y) \r\n"
+                                      + "ln(x) \r\n"
+                                      + "abs(x) \r\n"
+                                      + "exp(x) \r\n";
                     }
                     else
                     {

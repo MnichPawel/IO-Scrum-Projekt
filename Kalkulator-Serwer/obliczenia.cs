@@ -78,6 +78,32 @@ namespace Kalkulator_Serwer
                     double val1 = numbers.Pop();
                     numbers.Push(Tan(val1));
                 }
+                else if (str.Peek().Equals("factorial"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Silnia(val1));
+                }
+                else if (str.Peek().Equals("log"))
+                {
+                    double val1 = numbers.Pop();
+                    double val2 = numbers.Pop();
+                    numbers.Push(Log(val1, val2));
+                }
+                else if (str.Peek().Equals("ln"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Log(val1, Math.E));
+                }
+                else if (str.Peek().Equals("abs"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Abs(val1));
+                }
+                else if (str.Peek().Equals("exp"))
+                {
+                    double val1 = numbers.Pop();
+                    numbers.Push(Pow(Math.E, val1));
+                }
                 str.Dequeue();
                 if(error) { wynik = 0.0; return; }
             }
@@ -86,7 +112,7 @@ namespace Kalkulator_Serwer
             wynik = numbers.Pop();
         }
 
-        public double Plus(double x,double y) {
+        public double Plus(double x, double y) {
             return x + y;
         }
         public double Minus(double x, double y)
@@ -141,6 +167,28 @@ namespace Kalkulator_Serwer
         public double Tan(double x)
         {
             return Math.Tan(x);
+        }
+
+        public double Log(double num, double bas)
+        {
+            if(bas < 0.0)
+            {
+                error = true;
+                error_text = "Podstawa logarytmu nie może być mniejsza niż 0";
+                return 0.0;
+            }
+            if(num < 0.0)
+            {
+                error = true;
+                error_text = "Liczba logarytmowana nie może być mniejsza niż 0";
+                return 0.0;
+            }
+            return Math.Log(num, bas);
+        }
+
+        public double Abs(double x)
+        {
+            return Math.Abs(x);
         }
 
         public bool BylBlad()

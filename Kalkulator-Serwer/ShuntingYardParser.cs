@@ -30,11 +30,6 @@ namespace Kalkulator_Serwer
                 else if (Char.IsDigit(znak))
                 {
                     string liczba = "";
-                    /*if(operacje.Peek() == "-")
-                    {
-                        operacje.Pop();
-                        liczba += "-";
-                    }*/
                     liczba += znak;
 
                     int temp_i = i + 1;
@@ -45,15 +40,6 @@ namespace Kalkulator_Serwer
                     }
                     i = temp_i - 1;
                     to_return_queue.Enqueue(liczba);
-                }
-                else if ((znak == 'p' || znak == 'P') && (str[i + 1] == 'i' || str[i + 1] == 'I'))
-                {
-                    to_return_queue.Enqueue(Math.PI.ToString());
-                    i += 1;
-                }
-                else if (znak == 'e' || znak == 'E')
-                {
-                    to_return_queue.Enqueue(Math.E.ToString());
                 }
                 else if (znak == 'r' && str[i + 1] == 'o' && str[i + 2] == 'o' && str[i + 3] == 't')
                 {
@@ -74,6 +60,40 @@ namespace Kalkulator_Serwer
                 {
                     operacje.Push("tan");
                     i += 2;
+                }
+                else if (znak == 'f' && str[i + 1] == 'a' && str[i + 2] == 'c' && str[i + 3] == 't' && str[i + 4] == 'o' && str[i + 5] == 'r' && str[i + 6] == 'i' && str[i + 7] == 'a' && str[i + 8] == 'l')
+                {
+                    operacje.Push("factorial");
+                    i += 8;
+                }
+                else if (znak == 'l' && str[i + 1] == 'o' && str[i + 2] == 'g')
+                {
+                    operacje.Push("log");
+                    i += 2;
+                }
+                else if (znak == 'l' && str[i + 1] == 'n')
+                {
+                    operacje.Push("ln");
+                    i += 1;
+                }
+                else if (znak == 'a' && str[i + 1] == 'b' && str[i + 2] == 's')
+                {
+                    operacje.Push("abs");
+                    i += 2;
+                }
+                else if (znak == 'e' && str[i + 1] == 'x' && str[i + 2] == 'p')
+                {
+                    operacje.Push("exp");
+                    i += 2;
+                }
+                else if ((znak == 'p' || znak == 'P') && (str[i + 1] == 'i' || str[i + 1] == 'I'))
+                {
+                    to_return_queue.Enqueue(Math.PI.ToString());
+                    i += 1;
+                }
+                else if (znak == 'e' || znak == 'E')
+                {
+                    to_return_queue.Enqueue(Math.E.ToString());
                 }
                 else if(znak == ',') { 
                     while(operacje.Peek().ToCharArray()[0] != '(')
