@@ -68,8 +68,10 @@ namespace Kalkulator_Serwer
             byte[] buffer_get = new byte[1024];
             byte[] buffer_send;
 
+            List<string> operation_history = new List<string>();
+
             //buffer_send = Encoding.UTF8.GetBytes("Wprowadzaj liczby pojedynczo. W odpowiedzi otrzymasz te liczby spierwiastkowane. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Zależnie od ustawień komputera jako przecinek stosuje się , lub .\r\n");
-            buffer_send = Encoding.UTF8.GetBytes("Napisz HELP aby uzyskać pomoc.");
+            buffer_send = Encoding.UTF8.GetBytes("Napisz HELP aby uzyskać pomoc.\r\n");
             stream.Write(buffer_send, 0, buffer_send.Length);
 
             while (true)
@@ -87,7 +89,7 @@ namespace Kalkulator_Serwer
                     if (str.Equals("EXIT")) { break; }
 
                     string output_string;
-                    
+
                     //Sprawdź czy to nie komenda
                     if (str.Equals("CLIENTS"))
                     {
@@ -97,7 +99,7 @@ namespace Kalkulator_Serwer
                     else if (str.Equals("HELP"))
                     {
                         //Zwróć pomoc
-                        output_string = "Wprowadzaj działania matematyczne, aby otrzymać listę dostępnych funkcji napisz FUNCTIONS. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Jeśli chcesz użyć funkcji to jeśli jako argument użyte jest jakieś złożone obliczenie zamiast jednej liczby to należy je włożyć w nawiasy. \r\n";
+                        output_string = "Wprowadzaj działania matematyczne, aby otrzymać listę dostępnych funkcji napisz FUNCTIONS. Napisz EXIT jeśli chcesz wyjść. Napisz CLIENTS jeśli chcesz poznać liczbę klientów aktualnie podłączonych. Napisz HISTORY aby otrzymać historię twoich ostatnich wykonanych obliczeń. Jeśli chcesz użyć funkcji to jeśli jako argument użyte jest jakieś złożone obliczenie zamiast jednej liczby to należy je włożyć w nawiasy. \r\n";
                     }
                     else if (str.Equals("FUNCTIONS"))
                     {
@@ -111,6 +113,16 @@ namespace Kalkulator_Serwer
                                       + "ln(x) \r\n"
                                       + "abs(x) \r\n"
                                       + "exp(x) \r\n";
+                    }
+                    else if (str.Equals("HISTORY")) 
+                    {
+                        output_string = "";
+                        
+                        for(int i = 0; i < operation_history.Count; ++i)
+                        {
+                            output_string += (i + 1).ToString() + ".) " + operation_history[i];
+                        }
+                    
                     }
                     else
                     {
@@ -128,12 +140,14 @@ namespace Kalkulator_Serwer
                             else
                             {
                                 output_string = str + " = " + result.ToString() + "\r\n";
+
+                                operation_history.Add(output_string);
                             }
                         }
                         catch
                         {
                             //Jeśli byl nieznany blad to poinformuj uzytkownika
-                            output_string = "Błąd przy przetwarzaniu dzialania\r\n";
+                            output_string = "Błąd przy przetwarzaniu dzialania.\r\n";
                         }
                     }
 
