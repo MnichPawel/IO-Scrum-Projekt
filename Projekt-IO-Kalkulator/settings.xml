@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+	<IP>127.0.0.1</IP>
+	<Port>2000</Port>
+	<HistoryLimit>5</HistoryLimit>
+	<Timeout>100000</Timeout>
+</Settings>

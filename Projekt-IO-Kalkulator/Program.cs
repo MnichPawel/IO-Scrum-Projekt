@@ -12,7 +12,7 @@ namespace Projekt_IO_Kalkulator
     {
         static void Main(string[] args)
         {
-            Server server = new Server(IPAddress.Parse("127.0.0.1"), 2000);
+            Server server = new Server();
 
             server.WaitForClients(); //Serwer czeka na klientow
         }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Xml;
 
 namespace Kalkulator_Serwer
 {
@@ -18,23 +19,75 @@ namespace Kalkulator_Serwer
         //TcpClient client;
         //NetworkStream stream;
 
-        IPAddress ip_address;
-        int port_number;
+        IPAddress ip_address = IPAddress.Parse("127.0.0.1");
+        int port_number = 2000;
+
+        int history_limit = 100;
+        int timeout = 100000;
 
         int number_of_connected_clients = 0;
 
         /// <summary>
-        /// Konstruktor pobierający adres IP oraz port
+        /// Konstruktor ładujący ustawienia z pliku oraz uruchamiający TcpListener
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
-        public Server(IPAddress ip, int port)
+        public Server()
         {
-            ip_address = ip;
-            port_number = port;
+            LoadSettingsFromFile();
 
-            listener = new TcpListener(ip, port);
+            listener = new TcpListener(ip_address, port_number);
         }
+
+        /// <summary>
+        /// Funkcja ładująca ustawienia z pliku XML
+        /// </summary>
+        public void LoadSettingsFromFile()
+        {
+            string file = "settings.xml";
+
+            if (File.Exists(file))
+            {
+                try
+                {
+                    using (XmlReader reader = XmlReader.Create(file))
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader.IsStartElement())
+                            {
+                                switch (reader.Name.ToString())
+                                {
+                                    case "IP":
+                                        ip_address = IPAddress.Parse(reader.ReadString());
+                                        Console.WriteLine("IP: " + ip_address.ToString());
+                                        break;
+                                    case "Port":
+                                        port_number = int.Parse(reader.ReadString());
+                                        Console.WriteLine("Port: " + port_number.ToString());
+                                        break;
+                                    case "HistoryLimit":
+                                        history_limit = int.Parse(reader.ReadString());
+                                        Console.WriteLine("Limit historii: " + history_limit.ToString());
+                                        break;
+                                    case "Timeout":
+                                        timeout = int.Parse(reader.ReadString());
+                                        Console.WriteLine("Timeout: " + timeout.ToString() + "ms");
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(XmlException exception)
+                {
+                    Console.WriteLine("Wystąpiły problemy z plikiem settings.xml");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Brak pliku settings.xml");
+            }
+        }
+
         /// <summary>
         /// Funkcja która kończy się dopiero gdy do serwera podepnie się klient
         /// </summary>
@@ -64,7 +117,7 @@ namespace Kalkulator_Serwer
         {
             number_of_connected_clients++;
 
-            stream.ReadTimeout = 100000;
+            stream.ReadTimeout = timeout;
             byte[] buffer_get = new byte[1024];
             byte[] buffer_send;
 
@@ -103,7 +156,7 @@ namespace Kalkulator_Serwer
                     }
                     else if (str.Equals("FUNCTIONS"))
                     {
-                        //Zwróć pomoc
+                        //Zwróć możliwe funkcje
                         output_string = "root(x, y) \r\n"
                                       + "sin(x) \r\n"
                                       + "cos(x) \r\n"
@@ -142,6 +195,11 @@ namespace Kalkulator_Serwer
                                 output_string = str + " = " + result.ToString() + "\r\n";
 
                                 operation_history.Add(output_string);
+
+                                if (operation_history.Count > history_limit)
+                                {
+                                    operation_history.RemoveAt(0);
+                                }
                             }
                         }
                         catch
