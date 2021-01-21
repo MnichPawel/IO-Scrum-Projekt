@@ -141,7 +141,7 @@ namespace Kalkulator_Serwer
                     //Zakończ pętle jeśli otrzymano string EXIT
                     if (str.Equals("EXIT")) { break; }
 
-                    string output_string;
+                    string output_string = "";
 
                     //Sprawdź czy to nie komenda
                     if (str.Equals("CLIENTS"))
@@ -169,21 +169,18 @@ namespace Kalkulator_Serwer
                     }
                     else if (str.Equals("HISTORY")) 
                     {
-                        try
+                        if (operation_history.Count == 0)
                         {
-                            if (operation_history.Count == 0)
-                            {
-                                output_string = "";
-
-                                for (int i = 0; i < operation_history.Count; ++i)
-                                {
-                                    output_string += (i + 1).ToString() + ".) " + operation_history[i];
-                                }
-                            }
-                        }
-                        catch { 
-                            //Jeśli brak historii
                             output_string = "Brak historii do wyświetlenia.\r\n";
+                        }
+                        else
+                        {
+                            output_string = "";
+
+                            for (int i = 0; i < operation_history.Count; ++i)
+                            {
+                                output_string += (i + 1).ToString() + ".) " + operation_history[i];
+                            }
                         }
                     }
                     else
