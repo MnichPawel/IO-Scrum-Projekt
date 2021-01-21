@@ -169,13 +169,22 @@ namespace Kalkulator_Serwer
                     }
                     else if (str.Equals("HISTORY")) 
                     {
-                        output_string = "";
-                        
-                        for(int i = 0; i < operation_history.Count; ++i)
+                        try
                         {
-                            output_string += (i + 1).ToString() + ".) " + operation_history[i];
+                            if (operation_history.Count == 0)
+                            {
+                                output_string = "";
+
+                                for (int i = 0; i < operation_history.Count; ++i)
+                                {
+                                    output_string += (i + 1).ToString() + ".) " + operation_history[i];
+                                }
+                            }
                         }
-                    
+                        catch { 
+                            //Jeśli brak historii
+                            output_string = "Brak historii do wyświetlenia.\r\n";
+                        }
                     }
                     else
                     {
